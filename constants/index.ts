@@ -1,0 +1,1 @@
+export { FILE_TYPE_CONFIG, FILE_TYPE_COLORS, STORAGE_LIMIT, MAX_FILE_SIZE } from './file-types';
