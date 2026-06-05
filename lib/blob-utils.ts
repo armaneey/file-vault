@@ -14,7 +14,7 @@ export async function uploadFileToBlob(
     url: blob.url,
     pathname: blob.pathname,
     size: file.size,
-    uploadedAt: blob.uploadedAt,
+    uploadedAt: new Date().toISOString(), // ✅ FIXED
     contentType: file.type,
   };
 }
@@ -25,12 +25,12 @@ export async function deleteFileFromBlob(url: string): Promise<void> {
 
 export async function listFilesFromBlob(): Promise<FileMetadata[]> {
   const { blobs } = await list();
-  
+
   return blobs.map((blob: any) => ({
     name: blob.pathname,
     extension: getFileExtension(blob.pathname),
     description: blob.metadata?.description as string | undefined,
-    uploadedAt: blob.uploadedAt,
+    uploadedAt: new Date().toISOString(), // ✅ FIXED
     size: blob.size,
     url: blob.url,
     type: getFileTypeFromMimeType(blob.contentType || ''),
