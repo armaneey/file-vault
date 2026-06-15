@@ -8,7 +8,7 @@ const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 
 function checkBlobConfiguration(): boolean {
   if (!BLOB_TOKEN) {
-    throw new Error('Vercel Blob is not configured. Please set BLOB_READ_WRITE_TOKEN environment variable to enable cloud storage.');
+    throw new Error('')
   }
   return true;
 }
@@ -21,29 +21,27 @@ export async function uploadFile(formData: FormData): Promise<FileMetadata> {
     throw new Error('No file provided');
   }
 
-  // Security: File size validation
+ 
   if (file.size > MAX_FILE_SIZE) {
     throw new Error(`File size exceeds maximum limit of ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
   }
 
-  // Security: File extension validation
   const extension = file.name.split('.').pop()?.toLowerCase() || '';
   if (BLOCKED_EXTENSIONS.includes(extension)) {
     throw new Error(`File type .${extension} is not allowed for security reasons`);
   }
 
-  // Security: MIME type validation
+
   if (file.type && !ALLOWED_MIME_TYPES.includes(file.type)) {
     throw new Error(`File type ${file.type} is not allowed`);
   }
 
-  // Security: Sanitize file name
+
   const sanitizedName = sanitizeFileName(file.name);
 
   checkBlobConfiguration();
 
   try {
-    // Create a new File object with sanitized name
     const sanitizedFile = new File([file], sanitizedName, {
       type: file.type,
       lastModified: file.lastModified,
