@@ -53,3 +53,58 @@ export const FILE_TYPE_COLORS: Record<FileType, string> = {
 
 export const STORAGE_LIMIT = 20 * 1024 * 1024 * 1024; 
 export const MAX_FILE_SIZE = 100 * 1024 * 1024; 
+
+// Dangerous file extensions that are blocked
+export const BLOCKED_EXTENSIONS = [
+  'exe', 'msi', 'app', 'dmg', 'pkg', // Executables
+  'js', 'ts', 'jsx', 'tsx', 'mjs', 'cjs', // Scripts
+  'sh', 'bash', 'zsh', 'fish', 'ps1', 'bat', 'cmd', // Shell scripts
+  'php', 'asp', 'aspx', 'jsp', 'py', 'rb', 'go', 'rs', // Server code
+  'sql', 'db', 'sqlite', // Databases
+  'dll', 'so', 'dylib', // Libraries
+  'com', 'scr', 'vbs', 'jar', 'war', // Other dangerous files
+];
+
+// Allowed MIME types for additional validation
+export const ALLOWED_MIME_TYPES = [
+  // Images
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'image/bmp',
+  // Documents
+  'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'text/plain', 'text/rtf', 'application/rtf',
+  // Videos
+  'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska', 'video/webm',
+  // Audio
+  'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/flac', 'audio/aac',
+  // Archives
+  'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed',
+  'application/x-tar', 'application/gzip',
+];
+
+// Helper function to check if file type is allowed
+export function isFileTypeAllowed(extension: string, mimeType: string): boolean {
+  const ext = extension.toLowerCase();
+  
+  // Check if extension is blocked
+  if (BLOCKED_EXTENSIONS.includes(ext)) {
+    return false;
+  }
+  
+  // Check if MIME type is allowed
+  if (mimeType && !ALLOWED_MIME_TYPES.includes(mimeType)) {
+    return false;
+  }
+  
+  return true;
+}
+
+// Helper function to sanitize file name
+export function sanitizeFileName(fileName: string): string {
+  // Remove any path traversal attempts
+  const sanitized = fileName.replace(/\.\./g, '').replace(/[\/\\]/g, '');
+  
+  // Remove special characters that could be dangerous
+  const cleaned = sanitized.replace(/[<>:"|?*\x00-\x1F]/g, '');
+  
+  return cleaned;
+} 

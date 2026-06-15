@@ -20,6 +20,7 @@ export default function UploadsPage() {
       setFiles(fileList);
     } catch (error) {
       console.error('Failed to load files:', error);
+      setFiles([]);
     } finally {
       setIsLoading(false);
     }

@@ -8,3 +8,5 @@ export { SortDropdown } from './sort-dropdown';
 export { FilePreviewModal } from './file-preview-modal';
 export { ThemeToggle } from './theme-toggle';
 export { FileGrid } from './file-grid';
+export { SubscriptionModal } from './subscription-modal';
+export { EditFileModal } from './edit-file-modal';

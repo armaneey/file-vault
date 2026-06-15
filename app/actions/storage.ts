@@ -1,14 +1,14 @@
 'use server';
 
 import { uploadFileToBlob, deleteFileFromBlob, listFilesFromBlob, createFileMetadata } from '@/lib/blob-utils';
-import { FileMetadata, UploadResult } from '@/types/file';
+import { FileMetadata, UploadResult } from '@/types';
+import { BLOCKED_EXTENSIONS, ALLOWED_MIME_TYPES, MAX_FILE_SIZE, isFileTypeAllowed, sanitizeFileName } from '@/constants';
 
 const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 
 function checkBlobConfiguration(): boolean {
   if (!BLOB_TOKEN) {
-    console.warn('BLOB_READ_WRITE_TOKEN is not configured. Running in mock mode.');
-    return false;
+    throw new Error('Vercel Blob is not configured. Please set BLOB_READ_WRITE_TOKEN environment variable to enable cloud storage.');
   }
   return true;
 }
@@ -21,20 +21,35 @@ export async function uploadFile(formData: FormData): Promise<FileMetadata> {
     throw new Error('No file provided');
   }
 
-  if (!checkBlobConfiguration()) {
-    return {
-      name: file.name,
-      extension: file.name.split('.').pop() || '',
-      description: description || undefined,
-      uploadedAt: new Date().toISOString(),
-      size: file.size,
-      url: URL.createObjectURL(file),
-      type: getFileTypeFromMimeType(file.type),
-    };
+  // Security: File size validation
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error(`File size exceeds maximum limit of ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
   }
 
+  // Security: File extension validation
+  const extension = file.name.split('.').pop()?.toLowerCase() || '';
+  if (BLOCKED_EXTENSIONS.includes(extension)) {
+    throw new Error(`File type .${extension} is not allowed for security reasons`);
+  }
+
+  // Security: MIME type validation
+  if (file.type && !ALLOWED_MIME_TYPES.includes(file.type)) {
+    throw new Error(`File type ${file.type} is not allowed`);
+  }
+
+  // Security: Sanitize file name
+  const sanitizedName = sanitizeFileName(file.name);
+
+  checkBlobConfiguration();
+
   try {
-    const uploadResult: UploadResult = await uploadFileToBlob(file, description || undefined);
+    // Create a new File object with sanitized name
+    const sanitizedFile = new File([file], sanitizedName, {
+      type: file.type,
+      lastModified: file.lastModified,
+    });
+
+    const uploadResult: UploadResult = await uploadFileToBlob(sanitizedFile, description || undefined);
     return createFileMetadata(uploadResult, description || undefined);
   } catch (error) {
     console.error('Upload error:', error);
@@ -43,10 +58,7 @@ export async function uploadFile(formData: FormData): Promise<FileMetadata> {
 }
 
 export async function deleteFile(url: string): Promise<void> {
-  if (!checkBlobConfiguration()) {
-    console.warn('Mock mode: File deletion simulated');
-    return;
-  }
+  checkBlobConfiguration();
 
   try {
     await deleteFileFromBlob(url);
@@ -57,9 +69,7 @@ export async function deleteFile(url: string): Promise<void> {
 }
 
 export async function listFiles(): Promise<FileMetadata[]> {
-  if (!checkBlobConfiguration()) {
-    return [];
-  }
+  checkBlobConfiguration();
 
   try {
     return await listFilesFromBlob();

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, 
@@ -14,6 +15,7 @@ import {
   X
 } from 'lucide-react';
 import { cn } from '@/lib';
+import { SubscriptionModal } from '@/components/ui/subscription-modal';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/' },
@@ -35,6 +37,7 @@ interface SidebarProps {
 export function Sidebar({ isCollapsed = false, onCollapse, isMobileOpen = false, onMobileClose, className }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
 
   return (
     <aside
@@ -97,18 +100,26 @@ export function Sidebar({ isCollapsed = false, onCollapse, isMobileOpen = false,
           <div className="border-t p-4">
             <div className="mb-3 flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">Storage</span>
-              <span className="text-xs text-muted-foreground">8.24 GB / 20 GB</span>
+              <span className="text-xs text-muted-foreground">0 GB / 20 GB</span>
             </div>
             <div className="mb-4 h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-              <div className="h-full w-[41%] rounded-full bg-gradient-to-r from-purple-600 to-purple-400" />
+              <div className="h-full w-0 rounded-full bg-gradient-to-r from-purple-600 to-purple-400" />
             </div>
-            <button className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-purple-300 px-4 py-3 text-sm font-medium text-purple-600 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-400 dark:hover:bg-purple-900/20">
+            <button 
+              onClick={() => setIsSubscriptionModalOpen(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-purple-300 px-4 py-3 text-sm font-medium text-purple-600 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-400 dark:hover:bg-purple-900/20"
+            >
               <Lock className="size-4" />
               Unlock more storage
             </button>
           </div>
         )}
       </div>
+      
+      <SubscriptionModal 
+        isOpen={isSubscriptionModalOpen}
+        onClose={() => setIsSubscriptionModalOpen(false)}
+      />
     </aside>
   );
 }

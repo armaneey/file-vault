@@ -21,6 +21,7 @@ export default function FavoritesPage() {
       setFiles(fileList);
     } catch (error) {
       console.error('Failed to load files:', error);
+      setFiles([]);
     } finally {
       setIsLoading(false);
     }
