@@ -40,6 +40,11 @@ export async function uploadFile(formData: FormData): Promise<FileMetadata> {
   const sanitizedName = sanitizeFileName(file.name);
 
   checkBlobConfiguration();
+  console.log(
+  'BLOB TOKEN EXISTS:',
+  !!process.env.BLOB_READ_WRITE_TOKEN
+);
+
 
   try {
     const sanitizedFile = new File([file], sanitizedName, {
@@ -50,8 +55,8 @@ export async function uploadFile(formData: FormData): Promise<FileMetadata> {
     const uploadResult: UploadResult = await uploadFileToBlob(sanitizedFile, description || undefined);
     return createFileMetadata(uploadResult, description || undefined);
   } catch (error) {
-    console.error('Upload error:', error);
-    throw new Error('Failed to upload file');
+    console.error('Upload error FULL:', error);
+    throw error;
   }
 }
 

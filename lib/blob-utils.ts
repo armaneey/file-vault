@@ -1,21 +1,29 @@
 export const runtime = 'nodejs';
+
 import { put, del, list } from '@vercel/blob';
 import { FileMetadata, UploadResult } from '@/types/file';
-import { getFileTypeFromMimeType, getFileExtension } from './file-types';
+import {
+  getFileTypeFromMimeType,
+  getFileExtension,
+} from './file-types';
 
 export async function uploadFileToBlob(
   file: File,
   description?: string
 ): Promise<UploadResult> {
-  const blob = await put(file.name, file, {
-    access: 'public',
+  const bytes = await file.arrayBuffer();
+
+  const blob = await put(file.name, bytes, {
+    access: 'private'
   });
+
+ 
 
   return {
     url: blob.url,
     pathname: blob.pathname,
     size: file.size,
-    uploadedAt: new Date().toISOString(), 
+    uploadedAt: new Date().toISOString(),
     contentType: file.type,
   };
 }
@@ -25,13 +33,15 @@ export async function deleteFileFromBlob(url: string): Promise<void> {
 }
 
 export async function listFilesFromBlob(): Promise<FileMetadata[]> {
-  const { blobs } = await list({prefix: ''});
+  const { blobs } = await list({
+    prefix: '',
+  });
 
   return blobs.map((blob: any) => ({
     name: blob.pathname,
     extension: getFileExtension(blob.pathname),
-    description: blob.metadata?.description as string | undefined,
-    uploadedAt: new Date().toISOString(), 
+    description: undefined,
+    uploadedAt: new Date().toISOString(),
     size: blob.size,
     url: blob.url,
     type: getFileTypeFromMimeType(blob.contentType || ''),
