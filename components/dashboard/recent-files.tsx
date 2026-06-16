@@ -3,20 +3,53 @@
 import { FileMetadata } from '@/types';
 import { FileIcon } from '@/components/ui';
 import { formatFileSize, formatRelativeTime } from '@/lib';
-import { MoreVertical, Download, Eye } from 'lucide-react';
+import { MoreVertical, Download, Eye, Trash2 } from 'lucide-react';
 import { cn } from '@/lib';
+import { deleteFile } from '@/app/actions/storage';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface RecentFilesProps {
   files: FileMetadata[];
+  onRefresh?: () => void;
   className?: string;
 }
 
-export function RecentFiles({ files, className }: RecentFilesProps) {
+export function RecentFiles({ files, onRefresh, className }: RecentFilesProps) {
+  const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handlePreview = (file: FileMetadata) => {
+    window.open(file.url, '_blank');
+  };
+
+  const handleDownload = (file: FileMetadata) => {
+    const link = document.createElement('a');
+    link.href = file.url;
+    link.download = file.name;
+    link.click();
+  };
+
+  const handleDelete = async (url: string) => {
+    setDeletingUrl(url);
+    try {
+      await deleteFile(url);
+      onRefresh?.();
+    } catch (error) {
+      console.error('Failed to delete file:', error);
+    } finally {
+      setDeletingUrl(null);
+    }
+  };
+
   return (
     <div className={cn('rounded-2xl border bg-white p-6 shadow-sm dark:bg-gray-900', className)}>
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-foreground">Recent Files</h2>
-        <button className="text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300">
+        <button 
+          onClick={() => router.push('/files')}
+          className="text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+        >
           View all files
         </button>
       </div>
@@ -43,14 +76,24 @@ export function RecentFiles({ files, className }: RecentFilesProps) {
               </div>
 
               <div className="flex items-center gap-2">
-                <button className="rounded-lg p-2 text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-700">
+                <button 
+                  onClick={() => handlePreview(file)}
+                  className="rounded-lg p-2 text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-700"
+                >
                   <Eye className="size-4" />
                 </button>
-                <button className="rounded-lg p-2 text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-700">
+                <button 
+                  onClick={() => handleDownload(file)}
+                  className="rounded-lg p-2 text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-700"
+                >
                   <Download className="size-4" />
                 </button>
-                <button className="rounded-lg p-2 text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-700">
-                  <MoreVertical className="size-4" />
+                <button 
+                  onClick={() => handleDelete(file.url)}
+                  disabled={deletingUrl === file.url}
+                  className="rounded-lg p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 disabled:opacity-50"
+                >
+                  <Trash2 className="size-4" />
                 </button>
               </div>
             </div>

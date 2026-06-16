@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { uploadFile, listFiles } from './actions/storage';
+import { uploadFile, listFiles, deleteFile, updateFileMetadata } from './actions/storage';
 import { FileMetadata } from '@/types';
 import { WelcomeSection, UploadSection, DashboardStats, RecentFiles } from '@/components/dashboard';
 import { MobileNav } from '@/components/layout';
@@ -37,10 +37,30 @@ export default function Home() {
       formData.append('file', file);
       const uploadedFile = await uploadFile(formData);
       setFiles((prev) => [uploadedFile, ...prev]);
+      // Refresh from server to ensure consistency
+      await loadFiles();
     } catch (error) {
       console.error('Failed to upload file:', error);
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleDelete = async (url: string) => {
+    try {
+      await deleteFile(url);
+      await loadFiles();
+    } catch (error) {
+      console.error('Failed to delete file:', error);
+    }
+  };
+
+  const handleEdit = async (url: string, name: string, description: string) => {
+    try {
+      await updateFileMetadata(url, name, description);
+      await loadFiles();
+    } catch (error) {
+      console.error('Failed to update file:', error);
     }
   };
 
@@ -87,7 +107,7 @@ export default function Home() {
           icon={Heart} />
       </div>
       
-      <RecentFiles files={files} />
+      <RecentFiles files={files} onRefresh={loadFiles} />
       
       <MobileNav />
     </div>

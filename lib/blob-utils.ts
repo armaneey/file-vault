@@ -14,7 +14,8 @@ export async function uploadFileToBlob(
   const bytes = await file.arrayBuffer();
 
   const blob = await put(file.name, bytes, {
-    access: 'public'
+    access: 'public',
+    allowOverwrite: true
   });
 
  

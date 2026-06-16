@@ -95,6 +95,27 @@ export async function listFiles(): Promise<FileMetadata[]> {
   }
 }
 
+export async function updateFileMetadata(url: string, name: string, description?: string): Promise<FileMetadata> {
+  checkBlobConfiguration();
+
+  try {
+    // Vercel Blob doesn't support direct metadata updates
+    // We need to copy the file with new metadata
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const file = new File([blob], name, { type: blob.type });
+    
+    const uploadResult = await uploadFileToBlob(file, description);
+    // Delete the old file
+    await deleteFileFromBlob(url);
+    
+    return createFileMetadata(uploadResult, description);
+  } catch (error) {
+    console.error('Update metadata error:', error);
+    throw new Error('Failed to update file metadata');
+  }
+}
+
 function getFileTypeFromMimeType(
   mimeType: string,
 ): "image" | "pdf" | "document" | "video" | "audio" | "archive" | "other" {
