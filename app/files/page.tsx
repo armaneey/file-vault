@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { listFiles } from '../actions/storage';
 import { FileList } from '@/components/dashboard';
 
