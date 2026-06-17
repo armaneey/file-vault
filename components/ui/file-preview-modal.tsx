@@ -53,6 +53,14 @@ export function FilePreviewModal({ file, onClose }: FilePreviewModalProps) {
                   className="max-h-[600px] max-w-full object-contain rounded-lg"
                 />
               </div>
+            ) : file.type === 'pdf' ? (
+              <div className="flex items-center justify-center bg-purple-50/50 dark:bg-purple-950/20 rounded-xl min-h-[400px]">
+                <iframe
+                  src={file.url}
+                  className="w-full h-[600px] rounded-lg border-0"
+                  title={file.name}
+                />
+              </div>
             ) : (
               <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
                 <div className="flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-500/5">

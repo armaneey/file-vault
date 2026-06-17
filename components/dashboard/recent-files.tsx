@@ -8,6 +8,7 @@ import { cn } from '@/lib';
 import { deleteFile } from '@/app/actions/storage';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { FilePreviewModal } from '@/components/ui/file-preview-modal';
 
 interface RecentFilesProps {
   files: FileMetadata[];
@@ -17,10 +18,11 @@ interface RecentFilesProps {
 
 export function RecentFiles({ files, onRefresh, className }: RecentFilesProps) {
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
+  const [previewFile, setPreviewFile] = useState<FileMetadata | null>(null);
   const router = useRouter();
 
   const handlePreview = (file: FileMetadata) => {
-    window.open(file.url, '_blank');
+    setPreviewFile(file);
   };
 
   const handleDownload = (file: FileMetadata) => {
@@ -63,35 +65,35 @@ export function RecentFiles({ files, onRefresh, className }: RecentFilesProps) {
           files.slice(0, 5).map((file) => (
             <div
               key={file.url}
-              className="flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-800/50 dark:hover:bg-gray-800"  >
-              <FileIcon type={file.type} size={40} className="rounded-lg" />
+              className="group flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 transition-all duration-200 hover:shadow-md hover:border-purple-300 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-purple-700 dark:hover:shadow-lg dark:hover:shadow-purple-500/10"  >
+              <FileIcon type={file.type} size={40} className="rounded-lg transition-transform group-hover:scale-105" />
               
               <div className="flex min-w-0 flex-1">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
+                  <p className="truncate text-sm font-medium text-foreground group-hover:text-purple-600 transition-colors">{file.name}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {formatFileSize(file.size)} • {formatRelativeTime(file.uploadedAt)}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <button 
                   onClick={() => handlePreview(file)}
-                  className="rounded-lg p-2 text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-700"
+                  className="rounded-lg p-2 text-muted-foreground hover:bg-purple-100 hover:text-purple-600 dark:hover:bg-purple-900/20 dark:hover:text-purple-400 transition-colors"
                 >
                   <Eye className="size-4" />
                 </button>
                 <button 
                   onClick={() => handleDownload(file)}
-                  className="rounded-lg p-2 text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-700"
+                  className="rounded-lg p-2 text-muted-foreground hover:bg-purple-100 hover:text-purple-600 dark:hover:bg-purple-900/20 dark:hover:text-purple-400 transition-colors"
                 >
                   <Download className="size-4" />
                 </button>
                 <button 
                   onClick={() => handleDelete(file.url)}
                   disabled={deletingUrl === file.url}
-                  className="rounded-lg p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 disabled:opacity-50"
+                  className="rounded-lg p-2 text-muted-foreground hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors disabled:opacity-50"
                 >
                   <Trash2 className="size-4" />
                 </button>
@@ -100,6 +102,8 @@ export function RecentFiles({ files, onRefresh, className }: RecentFilesProps) {
           ))
         )}
       </div>
+      
+      <FilePreviewModal file={previewFile} onClose={() => setPreviewFile(null)} />
     </div>
   );
 }

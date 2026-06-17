@@ -5,10 +5,12 @@ import { listFiles, deleteFile, updateFileMetadata } from '../actions/storage';
 import { FileMetadata } from '@/types';
 import { FileList } from '@/components/dashboard';
 import { Heart } from 'lucide-react';
+import { FilePreviewModal } from '@/components/ui/file-preview-modal';
 
 export default function FavoritesPage() {
   const [files, setFiles] = useState<FileMetadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [previewFile, setPreviewFile] = useState<FileMetadata | null>(null);
 
   useEffect(() => {
     loadFiles();
@@ -46,9 +48,7 @@ export default function FavoritesPage() {
   };
 
   const handlePreview = (file: FileMetadata) => {
-    if (file.type === 'image') {
-      window.open(file.url, '_blank');
-    }
+    setPreviewFile(file);
   };
 
   return (
@@ -66,6 +66,8 @@ export default function FavoritesPage() {
         onDelete={handleDelete}
         onEdit={handleEdit}
         onPreview={handlePreview} />
+      
+      <FilePreviewModal file={previewFile} onClose={() => setPreviewFile(null)} />
     </div>
   );
 }
