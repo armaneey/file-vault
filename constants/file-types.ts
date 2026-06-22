@@ -16,7 +16,7 @@ export const FILE_TYPE_CONFIG: Record<
   },
   document: {
     label: 'Document',
-    extensions: ['doc', 'docx', 'txt', 'rtf', 'odt'],
+    extensions: ['doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx'],
     color: 'blue',
   },
   video: {
@@ -26,7 +26,7 @@ export const FILE_TYPE_CONFIG: Record<
   },
   audio: {
     label: 'Audio',
-    extensions: ['mp3', 'wav', 'ogg', 'flac', 'aac'],
+    extensions: ['mp3', 'wav', 'm4a', 'ogg', 'flac', 'aac'],
     color: 'yellow',
   },
   archive: {
@@ -71,11 +71,12 @@ export const ALLOWED_MIME_TYPES = [
   'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'image/bmp',
   // Documents
   'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   'text/plain', 'text/rtf', 'application/rtf',
   // Videos
   'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska', 'video/webm',
   // Audio
-  'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/flac', 'audio/aac',
+  'audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/ogg', 'audio/flac', 'audio/aac',
   // Archives
   'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed',
   'application/x-tar', 'application/gzip',

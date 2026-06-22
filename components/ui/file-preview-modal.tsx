@@ -25,14 +25,14 @@ export function FilePreviewModal({ file, onClose }: FilePreviewModalProps) {
   if (!file) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      <div className="relative z-50 w-full max-w-5xl animate-scale-in">
-        <div className="rounded-2xl border bg-gradient-to-br from-purple-50 to-white dark:from-purple-950/20 dark:to-gray-900 shadow-2xl shadow-purple-500/20 overflow-hidden">
+      <div className="relative z-[10000] w-full max-w-5xl animate-scale-in">
+        <div className="rounded-2xl border bg-white dark:bg-gray-900 shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between border-b bg-white/50 dark:bg-gray-900/50 p-4">
             <h3 className="truncate text-lg font-semibold text-foreground pr-4">{file.name}</h3>
@@ -45,7 +45,7 @@ export function FilePreviewModal({ file, onClose }: FilePreviewModalProps) {
           </div>
 
           <div className="p-6">
-            {file.type === 'image' ? (
+            {file.type === 'image' || file.extension === 'jpg' || file.extension === 'jpeg' || file.extension === 'png' || file.extension === 'gif' || file.extension === 'webp' || file.extension === 'svg' ? (
               <div className="flex items-center justify-center bg-purple-50/50 dark:bg-purple-950/20 rounded-xl min-h-[400px]">
                 <img
                   src={file.url}
@@ -53,13 +53,33 @@ export function FilePreviewModal({ file, onClose }: FilePreviewModalProps) {
                   className="max-h-[600px] max-w-full object-contain rounded-lg"
                 />
               </div>
-            ) : file.type === 'pdf' ? (
+            ) : file.type === 'pdf' || file.extension === 'pdf' ? (
               <div className="flex items-center justify-center bg-purple-50/50 dark:bg-purple-950/20 rounded-xl min-h-[400px]">
                 <iframe
                   src={file.url}
                   className="w-full h-[600px] rounded-lg border-0"
                   title={file.name}
                 />
+              </div>
+            ) : file.type === 'audio' || file.extension === 'mp3' || file.extension === 'wav' || file.extension === 'm4a' || file.extension === 'ogg' ? (
+              <div className="flex items-center justify-center bg-purple-50/50 dark:bg-purple-950/20 rounded-xl min-h-[400px]">
+                <audio
+                  src={file.url}
+                  controls
+                  className="w-full max-w-lg"
+                >
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            ) : file.type === 'video' || file.extension === 'mp4' || file.extension === 'webm' || file.extension === 'mov' || file.extension === 'avi' ? (
+              <div className="flex items-center justify-center bg-purple-50/50 dark:bg-purple-950/20 rounded-xl min-h-[400px]">
+                <video
+                  src={file.url}
+                  controls
+                  className="max-h-[600px] max-w-full rounded-lg"
+                >
+                  Your browser does not support the video element.
+                </video>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
@@ -69,6 +89,11 @@ export function FilePreviewModal({ file, onClose }: FilePreviewModalProps) {
                 <div>
                   <p className="text-lg font-medium text-foreground">Preview not available</p>
                   <p className="text-sm text-muted-foreground">Download the file to view its contents</p>
+                </div>
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <p className="text-sm font-medium text-foreground">{file.name}</p>
+                  <p className="text-xs text-muted-foreground">{file.size.toLocaleString()} bytes</p>
+                  <p className="text-xs text-muted-foreground">Added: {new Date(file.uploadedAt).toLocaleString()}</p>
                 </div>
               </div>
             )}

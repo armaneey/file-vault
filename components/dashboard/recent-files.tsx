@@ -72,12 +72,12 @@ export function RecentFiles({ files, onRefresh, className }: RecentFilesProps) {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-foreground group-hover:text-purple-600 transition-colors">{file.name}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {formatFileSize(file.size)} • {formatRelativeTime(file.uploadedAt)}
+                    {formatFileSize(file.size)} • {new Date(file.uploadedAt).toLocaleString()}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <div className="flex items-center gap-2 transition-opacity duration-200">
                 <button 
                   onClick={() => handlePreview(file)}
                   className="rounded-lg p-2 text-muted-foreground hover:bg-purple-100 hover:text-purple-600 dark:hover:bg-purple-900/20 dark:hover:text-purple-400 transition-colors"

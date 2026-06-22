@@ -126,7 +126,7 @@ export default function Home() {
         </div>
       )}
       {showSuccessToast && (
-        <div className="fixed bottom-4 right-4 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-green-200 dark:border-green-800 animate-in slide-in-from-bottom">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-green-200 dark:border-green-800 animate-in slide-in-from-top">
           <div className="flex items-center gap-3">
             <CheckCircle className="size-5 text-green-600" />
             <div>

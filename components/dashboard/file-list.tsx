@@ -5,6 +5,7 @@ import { FileIcon } from '@/components/ui';
 import { formatFileSize, formatRelativeTime } from '@/lib';
 import { Download, Eye, MoreVertical, Heart, Edit, Trash2 } from 'lucide-react';
 import { EditFileModal } from '@/components/ui';
+import { FilePreviewModal } from '@/components/ui/file-preview-modal';
 import { useState, useEffect } from 'react';
 
 interface FileListProps {
@@ -33,6 +34,7 @@ export function FileList({
   const [editingFile, setEditingFile] = useState<FileMetadata | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [previewFile, setPreviewFile] = useState<FileMetadata | null>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -52,6 +54,10 @@ export function FileList({
   const openEditModal = (file: FileMetadata) => {
     setEditingFile(file);
     setIsEditModalOpen(true);
+  };
+
+  const handlePreview = (file: FileMetadata) => {
+    setPreviewFile(file);
   };
   if (isLoading) {
     return (
@@ -88,7 +94,7 @@ export function FileList({
               <div className="min-w-0">
                 <p className="truncate text-xs sm:text-sm font-medium text-foreground">{file.name}</p>
                 <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-muted-foreground">
-                  {formatFileSize(file.size)} • {formatRelativeTime(file.uploadedAt)}
+                  {formatFileSize(file.size)} • {new Date(file.uploadedAt).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -101,13 +107,12 @@ export function FileList({
                   <Heart className="size-3.5 sm:size-4" />
                 </button>
               )}
-              {onPreview && (
-                <button 
-                  onClick={() => onPreview(file)}
-                  className="rounded-lg p-1.5 sm:p-2 text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-700"  >
-                  <Eye className="size-3.5 sm:size-4" />
-                </button>
-              )}
+              <button
+                onClick={() => handlePreview(file)}
+                className="rounded-lg p-1.5 sm:p-2 text-muted-foreground hover:bg-purple-100 hover:text-purple-600 dark:hover:bg-purple-900/20"
+              >
+                <Eye className="size-3.5 sm:size-4" />
+              </button>
               <button
                 onClick={() => openEditModal(file)}
                 className="rounded-lg p-1.5 sm:p-2 text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -140,6 +145,8 @@ export function FileList({
         fileDescription={editingFile?.description}
         onSave={handleEdit}
       />
+      
+      <FilePreviewModal file={previewFile} onClose={() => setPreviewFile(null)} />
     </>
   );
 }

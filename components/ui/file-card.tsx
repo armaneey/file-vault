@@ -8,6 +8,7 @@ import { Download, Trash2, ExternalLink, Eye, Edit } from 'lucide-react';
 import { deleteFile } from '@/app/actions/storage';
 import { useState, useEffect } from 'react';
 import { EditFileModal } from './edit-file-modal';
+import { FilePreviewModal } from './file-preview-modal';
 
 interface FileCardProps {
   file: FileMetadata;
@@ -21,6 +22,7 @@ export function FileCard({ file, onDelete, onEdit, onPreview, className }: FileC
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [previewFile, setPreviewFile] = useState<FileMetadata | null>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -46,6 +48,10 @@ export function FileCard({ file, onDelete, onEdit, onPreview, className }: FileC
 
   const handleEdit = (name: string, description: string) => {
     onEdit?.(file.url, name, description);
+  };
+
+  const handlePreview = () => {
+    setPreviewFile(file);
   };
 
   return (
@@ -74,21 +80,19 @@ export function FileCard({ file, onDelete, onEdit, onPreview, className }: FileC
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-muted-foreground">
             <span className="font-medium text-foreground">{formatFileSize(file.size)}</span>
             <span className="text-muted-foreground/50">•</span>
-            <span>{formatRelativeTime(file.uploadedAt)}</span>
+            <span>{new Date(file.uploadedAt).toLocaleString()}</span>
           </div>
         </div>
       </div>
 
       <div className="relative mt-4 sm:mt-5 flex items-center justify-end gap-1 sm:gap-2 opacity-100 sm:opacity-0 transition-all duration-300 transform translate-y-0 sm:translate-y-2 group-hover:translate-y-0 group-hover:opacity-100">
-        {file.type === 'image' && (
-          <button
-            onClick={() => onPreview?.(file)}
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-purple-600 hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-colors"
-          >
-            <Eye size={14} />
-            Preview
-          </button>
-        )}
+        <button
+          onClick={handlePreview}
+          className="hidden sm:inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-purple-600 hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-colors"
+        >
+          <Eye size={14} />
+          Preview
+        </button>
         
         <button
           onClick={() => setIsEditModalOpen(true)}
@@ -134,6 +138,8 @@ export function FileCard({ file, onDelete, onEdit, onPreview, className }: FileC
         fileDescription={file.description}
         onSave={handleEdit}
       />
+      
+      <FilePreviewModal file={previewFile} onClose={() => setPreviewFile(null)} />
     </div>
   );
 }
